@@ -1,12 +1,12 @@
 FROM ubuntu:xenial
 
-RUN apt-get update
-RUN apt-get install -y --no-install-recommends python \
+RUN apt-get -qq update
+RUN apt-get -qq install -y --no-install-recommends python \
 		libx11-dev libxfixes-dev libxi-dev \
 		libxcb1-dev libx11-xcb-dev libxcb-glx0-dev \
 		libdbus-1-dev libxkbcommon-dev libxkbcommon-x11-dev \
 		binutils g++ make zlib1g-dev libssl-dev \
-		libgl1-mesa-dev xz-utils curl
+		libgl1-mesa-dev xz-utils curl > /dev/null
 
 RUN apt-get -y clean && rm -rf /var/cache/apt/* /var/lib/apt/lists/*
 ENV QT_MAJOR 5
@@ -24,7 +24,6 @@ RUN ./configure -static -release -no-compile-examples -prefix /usr/local \
 		-skip qtactiveqt \
 		-skip qtandroidextras \
 		-skip qtcanvas3d \
-		-skip qtcharts \
 		-skip qtconnectivity \
 		-skip qtdatavis3d \
 		-skip qtdoc \
@@ -57,4 +56,7 @@ RUN ./configure -static -release -no-compile-examples -prefix /usr/local \
 		-qt-freetype -qt-pcre -qt-harfbuzz -qt-libpng -qt-libjpeg \
 		-system-zlib
 
-RUN make -j`nproc` && make install && cd / && rm -rf /${QT_NAME}
+RUN make -s -j`nproc`
+RUN make install
+WORKDIR /
+RUN rm -rf /${QT_NAME}
