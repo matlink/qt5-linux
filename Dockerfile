@@ -6,7 +6,7 @@ RUN apt-get -qq install -y --no-install-recommends python \
 		libxcb1-dev libx11-xcb-dev libxcb-glx0-dev \
 		libdbus-1-dev libxkbcommon-dev libxkbcommon-x11-dev \
 		binutils g++ make zlib1g-dev libssl-dev \
-		libgl1-mesa-dev xz-utils curl > /dev/null
+		libgl1-mesa-dev xz-utils curl libfontconfig1-dev > /dev/null
 
 RUN apt-get -y clean && rm -rf /var/cache/apt/* /var/lib/apt/lists/*
 ENV QT_MAJOR 5
@@ -49,12 +49,13 @@ RUN ./configure -static -release -no-compile-examples -prefix /usr/local \
 		-skip qtwinextras \
 		-skip qtxmlpatterns \
 		-c++std c++11 \
+                -fontconfig \
 		-no-gif -no-icu -no-glib -no-qml-debug \
 		-opengl desktop -no-eglfs -no-opengles3 -no-angle -no-egl \
 		-qt-xcb -qt-xkbcommon \
 		-openssl-runtime -dbus-runtime \
 		-qt-freetype -qt-pcre -qt-harfbuzz -qt-libpng -qt-libjpeg \
-		-system-zlib
+		-system-zlib -system-freetype
 
 RUN make -s -j`nproc`
 RUN make install
