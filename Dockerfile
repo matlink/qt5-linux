@@ -1,24 +1,25 @@
-FROM ubuntu:xenial
+FROM ubuntu:bionic
 
 RUN apt-get -qq update
 RUN apt-get -qq install -y --no-install-recommends python \
 		libx11-dev libxfixes-dev libxi-dev \
 		libxcb1-dev libx11-xcb-dev libxcb-glx0-dev \
 		libdbus-1-dev libxkbcommon-dev libxkbcommon-x11-dev \
-		binutils g++ make zlib1g-dev libssl-dev \
-		libgl1-mesa-dev xz-utils curl libfontconfig1-dev > /dev/null
+		zlib1g-dev libgl1-mesa-dev libfontconfig1-dev \
+		build-essential wget libssl1.0-dev > /dev/null
 
 RUN apt-get -y clean && rm -rf /var/cache/apt/* /var/lib/apt/lists/*
+
 ENV QT_MAJOR 5
 ENV QT_MINOR 9
 ENV QT_PATCH 1
 ENV QT_NAME qt-everywhere-opensource-src-${QT_MAJOR}.${QT_MINOR}.${QT_PATCH}
-RUN curl -O -L http://download.qt.io/official_releases/qt/${QT_MAJOR}.${QT_MINOR}/${QT_MAJOR}.${QT_MINOR}.${QT_PATCH}/single/${QT_NAME}.tar.xz
+RUN wget http://download.qt.io/official_releases/qt/${QT_MAJOR}.${QT_MINOR}/${QT_MAJOR}.${QT_MINOR}.${QT_PATCH}/single/${QT_NAME}.tar.xz
 
 RUN tar xJf ${QT_NAME}.tar.xz
 RUN rm ${QT_NAME}.tar.xz
 WORKDIR ${QT_NAME}
-RUN ./configure -static -release -no-compile-examples -prefix /usr/local \
+RUN ./configure -silent -static -release -no-compile-examples -prefix /usr/local \
 		-opensource -confirm-license \
 		-skip qt3d \
 		-skip qtactiveqt \
@@ -58,6 +59,6 @@ RUN ./configure -static -release -no-compile-examples -prefix /usr/local \
 		-system-zlib -system-freetype
 
 RUN make -s -j`nproc`
-RUN make install
+RUN make -s install
 WORKDIR /
 RUN rm -rf /${QT_NAME}
